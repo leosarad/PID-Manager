@@ -82,7 +82,9 @@ void choiceB(){
 			for(int i=0;i<num;i++){
 				pthread_t p;
 				pthread_create(&p,NULL,createProcess,&time);
-			}
+			}back:
+			if(c!=num)
+				goto back;
 			choiceB();
 		} else{
 			printf("\nInputs Invalid)");
