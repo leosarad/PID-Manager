@@ -13,96 +13,98 @@ int bitMap[size];
 int c=0;
 // Declaring required functions for program;
 int allocateMap();
-int allocatePID(int time);
+int allocatePID(int);
 int releasePID(int);
 void *createProcess(void *time);
 int totalAvail();
 int nextAvail();
 // Menu Functions
-void menuA();
-void menuB();
-void choiceB();
+void menu();
+void choice();
 
 
 // Main Function
 int main(){
-	printf("Process ID Manager");
-	menuA();
-	printf("\nProgram Ends\n");
+	allocateMap();
+	menu();
+	printf("\nMain Program Ends\n");
 	return 0;
 }
 
 // Function Definitions
-void menuA(){
-   printf("\nMenu:");
-	printf("\nPress 1: Start PID Manager");
-	printf("\nPress Any Key: Exit");
-	char ch;
-	printf("\nMenu Choice: ");
-	ch=getchar();
-	if(ch=='1'){
-		allocateMap();
-		menuB();
-	} else{ 
-		printf("\nProgram Ends\n");
-		exit(0);
-	}
+
+void menu(){
+   printf("\n-------------------------------");
+	printf("\n|   PID Manager               |");
+	printf("\n-------------------------------");
+	printf("\n|Key  | Menu                  |");
+	printf("\n-------------------------------");
+	printf("\n|1    | Total PID's available |");
+	printf("\n|2    | First PID available   |");
+	printf("\n|3    | Create Processes      |");
+	printf("\n|4    | Any Key to Exit       |\n");
+	printf("-------------------------------\n");
+	choice();
+	getchar();
 }
 
-void menuB(){
-   printf("\nMenu:");
-	printf("\n1. Total PID's available");
-	printf("\n2. First PID available");
-	printf("\n3. Create Processes");
-	printf("\n4. Press any key to Exit.\n");
-	choiceB();
-}
-
-void choiceB(){
+void choice(){
 	c=0;
 	char ch;
-	printf("\nMenu Choice (|1|2|3|): ");
-	getchar();
+	printf("\nMenu Choice | 1 | 2 | 3 | exit |: ");
 	ch=getchar();
 	if(ch=='1'){
 		int totalId=totalAvail();
-		printf("\nTotal Available PID: %d",totalId);
-		choiceB();
+		printf("-------------------------------");
+		printf("\n| Total PID Available: %d     |",totalId);
+		printf("\n-------------------------------\n");
 	} else if(ch=='2'){
 		int nextId=nextAvail();
-		printf("\nFist Available PID: %d",nextId);
-		choiceB();
+		printf("-------------------------------");
+		printf("\n| First Available PID: %d     |",nextId);
+		printf("\n-------------------------------\n");
 	} else if(ch=='3'){
 		int num,time;
-		printf("\nCreate Process:\nInput-> Number of Process | Execution Time :");
-		scanf("%d %d",&num,&time);
+		//printf("\nCreate Process:\nInput-> Number of Process | Execution Time :");
+		printf("\n-------------------------------");
+		printf("\n| Create Process:             |");
+		printf("\n-------------------------------\n");
+		printf("Number of Process: ");
+		scanf("%d",&num);
+		printf("Execution Time: ");
+		scanf("%d",&time);
+		int a[3]={num,time,0};
 		int valid=totalAvail();
 		if(num>0 && num<=valid && time>0){
-			printf("\nProcesses created(Execution time %dsec): \n",time);
+			printf("-------------------------");
+			printf("\n|   %d Process created   |",num);
+			printf("\n-------------------------\n");
+			printf("|PID | Execution Time   |\n");
 			for(int i=0;i<num;i++){
 				pthread_t p;
-				pthread_create(&p,NULL,createProcess,&time);
-			}back:
+				pthread_create(&p,NULL,createProcess,a);
+			}
+			back:
 			if(c!=num)
 				goto back;
-			choiceB();
+			else{
+				printf("-------------------------\n");	
+			}
 		} else{
 			printf("\nInputs Invalid)");
-			choiceB();
 		}
-		
-	}
-	else{ 
+	} else{ 
 		printf("Program Ends\n");
 		exit(0);
 	}
+	getchar();
+	choice();
 }
 
 int allocateMap(){
 	for(int i=0;i<size;i++){
 		bitMap[i]=0;
 	}
-	printf("\nPID Manager Starts\nRange: %d - %d(Inclusive)\nTotal Available: %d",start+1,end,size);
 	return 1;
 }
 int totalAvail(){
@@ -121,12 +123,15 @@ int nextAvail(){
 			}
 	}
 }
-void *createProcess(void *t){
+void *createProcess(void *a){
 	int pid;
-	int time=*(int *)t;
+	int time=*((int *)a+1);
+	int num=*((int *)a+0);
+	int *count=((int *)a+2);
+	*count=*count+1;
 	pid=allocatePID(time);
 	sleep(time);
-	releasePID(pid);
+	releasePID(pid);		
 	return NULL;
 }
 int allocatePID(int time){
@@ -138,15 +143,15 @@ int allocatePID(int time){
 			break;
 			}
 	}
-	printf("Process PID: %d\n",pid);
+	printf("|%d |   %d              |\n",pid,time);
 	c++;
 	return pid;
 }
 int releasePID(int pid){
 	int i=pid-start-1;
-		if(bitMap[i]==1){
-			bitMap[i]=0;
-			}
-	printf("Process End. PID Realeased : %d\n",pid);
+	printf("Released PID :%d\n",pid);
+	if(bitMap[i]==1){
+		bitMap[i]=0;
+		}
 	return 1;
 }
