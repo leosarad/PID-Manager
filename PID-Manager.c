@@ -91,7 +91,7 @@ void choice(){
 				printf("-------------------------\n");	
 			}
 		} else{
-			printf("\nInputs Invalid)");
+			printf("\nInputs Invalid | PID not Available");
 		}
 	} else{ 
 		printf("Program Ends\n");
@@ -118,17 +118,15 @@ int totalAvail(){
 int nextAvail(){
 	for(int i=0;i<size;i++){
 		if(bitMap[i]==0){
-			int pid=start+i+1;
+			int pid=start+i;
 			return pid;
 			}
 	}
+	return 0;
 }
 void *createProcess(void *a){
 	int pid;
 	int time=*((int *)a+1);
-	int num=*((int *)a+0);
-	int *count=((int *)a+2);
-	*count=*count+1;
 	pid=allocatePID(time);
 	sleep(time);
 	releasePID(pid);		
@@ -136,9 +134,9 @@ void *createProcess(void *a){
 }
 int allocatePID(int time){
 	int pid;
-	for(int i=0;i<size;i++){
+	for(int i=0;i<=size;i++){
 		if(bitMap[i]==0){
-			pid=start+i+1;
+			pid=start+i;
 			bitMap[i]=1;
 			break;
 			}
@@ -148,7 +146,7 @@ int allocatePID(int time){
 	return pid;
 }
 int releasePID(int pid){
-	int i=pid-start-1;
+	int i=pid-start;
 	printf("Released PID :%d\n",pid);
 	if(bitMap[i]==1){
 		bitMap[i]=0;
